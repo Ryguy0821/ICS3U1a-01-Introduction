@@ -1,0 +1,38 @@
+
+#Allows random integers to be created
+import random
+
+#Variables for creating ranom letters
+Num0s= 0
+Num1s= 0
+RandLett0= 0
+RandLett1= 0
+
+#Input
+sentence= input("Message:")
+
+#Reads each letter in the sentence
+for i in range(0,len(sentence)):
+  asciiNum= (ord(sentence[i])) #Converts each letter to ascii numbers
+  #Turns ascii numbers into into binary, binary is then each 0,1 becomes a string
+  Text=str(bin(asciiNum)[2:])  
+  
+  #Reads each 0,1 string
+  for tex in range(0,len(Text)):
+    asciiB= (ord(Text[tex])) #Creates the ascii value for 0 and 1
+    
+    #Creats a random int after each 0 and 1 ascii is created
+    #ints are created by a range on the ascii chart to create multiple
+    #uppercases and lowercases at random
+    Num0s= random.randint(97,122)
+    Num1s= random.randint(65,90)
+    
+    #if a 0 
+    if asciiB == 48:
+      RandLett0= chr(Num0s) #Convert random int to letter
+      print(RandLett0) #Outputs random lowercase letter
+    
+    #if a 1
+    elif asciiB == 49:
+      RandLett1= chr(Num1s) #Convert random int to letter
+      print(RandLett1) #Outputs random Uppercase letter
