@@ -1,6 +1,5 @@
-
 # Encryption/Decryption test Original version by Symb1ote and ArcKnight18
-# Last Modified on: 2/17/2018, 9:51 PM
+# Last Modified on: 2/17/2018, 11:19 PM
 
 # Encrypt Test
 
@@ -35,25 +34,22 @@ countSort = 0
 groupBin = ""
 realBin = ""
 countRep = 7
-horzontal = 0
+horizontal = 0
 
 for D in range(0,len(letterHoriz)):
   asciiValue = (ord(letterHoriz[D]))
-  
   if 122 >= asciiValue >= 97:
     countSort += 1
     groupBin += "0"
-    
   elif 90 >= asciiValue >= 65:
     countSort += 1
     groupBin += "1"
-    
   if countSort in (7, countRep):
-    realBin = ("" + groupBin)#altered
-    horzant=(chr(int(realBin, 2)))
-    horzontal= str(horzontal)+str(horzant)#new
+    realBin = ("" + groupBin) # Altered
+    horzant = (chr(int(realBin, 2)))
+    horizontal = str(horizontal) + str(horzant) # New
     groupBin = ""
     realBin = ""
     countRep += 7
-horzontal= horzontal[1:]#new
-print("Decrypted Message:",horzontal)#new
+horizontal = horizontal[1:] # New
+print("Decrypted Message:", horizontal) # New
