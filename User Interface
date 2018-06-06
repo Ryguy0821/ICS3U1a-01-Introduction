@@ -4,8 +4,8 @@
 import pygame
 
 pygame.init()
-displayHeight =
-displayWidth = 
+displayHeight = 1900
+displayWidth = 1000
 
 white = (255,255,255)
 
