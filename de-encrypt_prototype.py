@@ -3,7 +3,7 @@
 # Ryan, Ares, and Ross
 # Encrypt Test
 
-import random
+import random, pygame
 
 numZeroes = 0
 numOnes = 0
