@@ -1,0 +1,23 @@
+#User Interface
+#Ryan
+
+import pygame
+
+pygame.init()
+displayHeight =
+displayWidth = 
+
+white = (255,255,255)
+
+gameDisplay = pygame.display.set_mode((displayHeight,displayWidth))
+pygame.display.set_caption('Encryption')
+clock = pygame.time.Clock()
+
+crashed = False
+
+while not crashed:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            crashed = True
+            
+gameDisplay.fill(white)
