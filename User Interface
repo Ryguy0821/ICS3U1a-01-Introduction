@@ -20,12 +20,19 @@ gameDisplay = pygame.display.set_mode((displayHeight,displayWidth))
 pygame.display.set_caption('Encryption')
 clock = pygame.time.Clock()
 
+gameDisplay.fill(white)
+rectplace = pygame.draw.rect(gameDisplay, (255, 0, 0),(855, 400, 155, 30))
+textDisplay(displayHeight,displayWidth,black)
+
 crashed = False
 
 while not crashed:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             crashed = True
-            
-    gameDisplay.fill(white)
-    textDisplay(displayHeight,displayWidth,black)
+
+    pos = pygame.mouse.get_pos()
+    pressed1, pressed2, pressed3 = pygame.mouse.get_pressed()
+
+    if rectplace.collidepoint(pos) and pressed1:
+        print ("clicked")
