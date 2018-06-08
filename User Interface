@@ -7,9 +7,9 @@ pygame.init()
 displayHeight = 1900
 displayWidth = 1000
 
-def textDisplay(x,y,black):
+def textDisplay(text,x,y,black):
     font = pygame.font.SysFont("comicsansms",20)
-    text = font.render("BiSA-Encryption", True, black)
+    text = font.render(text, True, black)
     gameDisplay.blit(text,(x*0.45,y*0.4))
     pygame.display.update()
 
@@ -21,8 +21,11 @@ pygame.display.set_caption('Encryption')
 clock = pygame.time.Clock()
 
 gameDisplay.fill(white)
-rectplace = pygame.draw.rect(gameDisplay, (255, 0, 0),(855, 400, 155, 30))
-textDisplay(displayHeight,displayWidth,black)
+rectplace = pygame.draw.rect(gameDisplay, (255, 255, 255),(855, 400, 155, 30))
+encryptRectplace = pygame.draw.rect(gameDisplay, (255, 255, 255),(890, 565, 90, 25))
+textDisplay("BiSA-Encryption",displayHeight,displayWidth,black)
+textDisplay("Encrypt",2000,1400,black)
+
 
 crashed = False
 
@@ -36,3 +39,6 @@ while not crashed:
 
     if rectplace.collidepoint(pos) and pressed1:
         print ("clicked")
+
+    if encryptRectplace.collidepoint(pos) and pressed1:
+        print ("encrypt")
