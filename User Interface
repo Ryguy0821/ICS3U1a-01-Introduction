@@ -13,19 +13,28 @@ def textDisplay(text,x,y,black):
     gameDisplay.blit(text,(x*0.45,y*0.4))
     pygame.display.update()
 
+def background(Img):
+    gameDisplay.blit(Img,(0,0))
+    
+
 white = (255,255,255)
 black = (0,0,0)
+
+backgroundImg = pygame.image.load('background.png')
+backgroundImg = pygame.transform.scale(backgroundImg,(1900,1000))
 
 gameDisplay = pygame.display.set_mode((displayHeight,displayWidth))
 pygame.display.set_caption('Encryption')
 clock = pygame.time.Clock()
 
 gameDisplay.fill(white)
-rectplace = pygame.draw.rect(gameDisplay, (255, 255, 255),(855, 400, 155, 30))
-encryptRectplace = pygame.draw.rect(gameDisplay, (255, 255, 255),(890, 565, 90, 25))
+background(backgroundImg)
+rectplace = pygame.draw.rect(gameDisplay, (white),(855, 400, 155, 30))
+encryptRectplace = pygame.draw.rect(gameDisplay, (white),(890, 565, 90, 25))
+decryptRectplace = pygame.draw.rect(gameDisplay, (white),(895, 685, 80, 25))
 textDisplay("BiSA-Encryption",displayHeight,displayWidth,black)
 textDisplay("Encrypt",2000,1400,black)
-
+textDisplay("Decrypt",2000,1700,black)
 
 crashed = False
 
@@ -39,6 +48,12 @@ while not crashed:
 
     if rectplace.collidepoint(pos) and pressed1:
         print ("clicked")
+        textDisplay("hello",2000,1550,black)
 
     if encryptRectplace.collidepoint(pos) and pressed1:
         print ("encrypt")
+        background(backgroundImg)
+
+    if decryptRectplace.collidepoint(pos) and pressed1:
+        print ("decrypt")
+        background(backgroundImg)
