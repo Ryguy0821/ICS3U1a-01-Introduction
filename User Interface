@@ -8,7 +8,7 @@ displayHeight = 1900
 displayWidth = 1000
 
 def textDisplay(text,x,y,black):
-    font = pygame.font.SysFont("comicsansms",20)
+    font = pygame.font.SysFont("timesnewroman",20)
     text = font.render(text, True, black)
     gameDisplay.blit(text,(x*0.45,y*0.4))
     pygame.display.update()
@@ -28,13 +28,21 @@ pygame.display.set_caption('BiSA-Encryption')
 clock = pygame.time.Clock()
 
 gameDisplay.fill(white)
-background(backgroundImg)
-rectplace = pygame.draw.rect(gameDisplay, (white),(855, 400, 155, 30))
-encryptRectplace = pygame.draw.rect(gameDisplay, (white),(890, 565, 90, 25))
-decryptRectplace = pygame.draw.rect(gameDisplay, (white),(895, 685, 80, 25))
-textDisplay("BiSA-Encryption",displayHeight,displayWidth,black)
-textDisplay("Encrypt",2000,1400,black)
-textDisplay("Decrypt",2000,1700,black)
+
+rectplace = pygame.draw.rect(gameDisplay, (white),(852, 400, 150, 20))
+encryptRectplace = pygame.draw.rect(gameDisplay, (white),(885, 560, 80, 20))
+decryptRectplace = pygame.draw.rect(gameDisplay, (white),(890, 680, 75, 20))
+
+def menu():
+    background(backgroundImg)
+    rectplace = pygame.draw.rect(gameDisplay, (white),(852, 400, 150, 20))
+    encryptRectplace = pygame.draw.rect(gameDisplay, (white),(885, 560, 80, 20))
+    decryptRectplace = pygame.draw.rect(gameDisplay, (white),(890, 680, 75, 20))
+    textDisplay("BiSA-Encryption",displayHeight,displayWidth,black)
+    textDisplay("Encrypt",2000,1400,black)
+    textDisplay("Decrypt",2000,1700,black)
+
+menu()
 
 crashed = False
 
@@ -48,18 +56,19 @@ while not crashed:
 
     if rectplace.collidepoint(pos) and pressed1:
         print ("clicked")
-        textDisplay("hello",2000,1550,black)
 
     if encryptRectplace.collidepoint(pos) and pressed1:
         print ("encrypt")
         background(backgroundImg)
-        backRect = pygame.draw.rect(gameDisplay,(white),(40,885,60,25))
-        textDisplay("Back",100,2200,black)
+        textDisplay("Type message in python shell.",2000,1550,black)
+        message = input("What would you like to encrypt?")
+        menu()
 
     if decryptRectplace.collidepoint(pos) and pressed1:
         print ("decrypt")
         background(backgroundImg)
-        backRect = pygame.draw.rect(gameDisplay,(white),(40,885,60,25))
-        textDisplay("Back",100,2200,black)
+        textDisplay("Type encrypted mesage in pyhton shell.",2000,1550,black)
+        message = input("what would you like to decrypt?")
+        menu()
 
 
