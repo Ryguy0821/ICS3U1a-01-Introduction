@@ -24,7 +24,7 @@ backgroundImg = pygame.image.load('background.png')
 backgroundImg = pygame.transform.scale(backgroundImg,(1900,1000))
 
 gameDisplay = pygame.display.set_mode((displayHeight,displayWidth))
-pygame.display.set_caption('Encryption')
+pygame.display.set_caption('BiSA-Encryption')
 clock = pygame.time.Clock()
 
 gameDisplay.fill(white)
@@ -53,7 +53,13 @@ while not crashed:
     if encryptRectplace.collidepoint(pos) and pressed1:
         print ("encrypt")
         background(backgroundImg)
+        backRect = pygame.draw.rect(gameDisplay,(white),(40,885,60,25))
+        textDisplay("Back",100,2200,black)
 
     if decryptRectplace.collidepoint(pos) and pressed1:
         print ("decrypt")
         background(backgroundImg)
+        backRect = pygame.draw.rect(gameDisplay,(white),(40,885,60,25))
+        textDisplay("Back",100,2200,black)
+
+
