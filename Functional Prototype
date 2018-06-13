@@ -1,0 +1,139 @@
+import math, random
+
+# RSA Encryptor/Decryptor
+# First step of two step BiSA Encryption process
+# Made by Symb1ote on Git
+
+p = 0
+q = 0
+e = 0
+d = 0
+
+def selPrimes():
+	global p, q
+	p = int(input("Input a prime number for 'p': "))
+	q = int(input("Input a prime number for 'q': "))
+	if p == q:
+		print ("They cannot be equal.")
+		selPrimes()
+
+def gcd(a, b):
+    divisor = math.gcd(a, b)
+    return divisor
+
+def extEuclidAlgorithm(e, phi):
+	'''This particular integration of the Extended Euclidean Algorithm is based on the works of JonCooperWorks on Git. I understand finding the multiplicative inverse of numbers using EEA to a certain degree but had trouble integrating the methods of calculation on Python3. I documented the code as far as I could understand.''' 
+
+	X1 = 0
+	X2 = 1
+	Y1 = 1
+	d = 0
+
+	propPhi = phi
+	while e > 0:
+		tempOne = propPhi // e
+		tempTwo = propPhi - tempOne * e
+		propPhi = e
+		e = tempTwo
+        
+		X = X2 - tempOne * X1
+		Y = d - tempOne * Y1
+		
+		X2 = X1
+		X1 = X
+		d = Y1
+		Y1 = Y
+
+	if propPhi == 1:
+		return d + phi
+
+def coprimeCorrector(phi):
+	'''Corrects greatest common divisor for phi(n) and e to assume whether or not e is coprime with phi(n) and assign it to a new coprime value if not coprime.'''
+	global e
+	x = gcd(e, phi)
+	while x != 1:
+		e = random.randint(2, phi - 1)
+		x = gcd(e, phi)
+
+def coprimeConstant(phi):
+	global e
+	e = random.randint(2, phi - 1)
+
+def primeCheck(x):
+    yesPrime = False
+    if x < 2:
+        return yesPrime
+    if x % 2 == 0:
+        return yesPrime
+    for x in range(3, int(math.sqrt(x))+ 2, 2):
+        if x % 2 == 0:
+            return yesPrime
+    yesPrime = True
+    return yesPrime
+
+def primeFinalCheck(p, q):
+	if p < 100:
+		print ("To ensure maximum security, please use values atleast 3 digits long.")
+		return False
+	if q < 100:
+		print ("To ensure maximum security, please use values atleast 3 digits long.")
+		return False
+	if (primeCheck(p) and primeCheck(q)) == False:
+		print ("Both numbers must be prime.")
+		return False
+	else:
+		return True
+
+def keygen(p, q):
+	global e
+	phi = (p-1)*(q-1) # Golden ratio
+	n = (p * q)
+	coprimeConstant(phi)
+	coprimeCorrector(phi)
+	d = extEuclidAlgorithm(e, phi)
+	return ((e, n), (d, n))
+
+selPrimes()
+while True:
+	if primeFinalCheck(p, q) == False:
+		selPrimes()
+	else:
+		break
+print ("Public, Private Key:", keygen(p, q))
+
+publKey, privKey = keygen(p, q)
+
+def encryptor(privKey, confidential):
+	trueText = []
+	key, n = privKey
+	for i in range(0, len(confidential)):
+		trueText.append((ord(confidential[i]) ** key) % n)
+	return trueText
+
+def decryptor(publKey, confidential):
+	trueText = []
+	key, n = publKey
+	for i in range(0, len(confidential)):
+		trueText.append(chr((confidential[i] ** key) % n))
+	return trueText
+
+def textSort(x):
+	trueText = ""
+	for i in range(len(x)):
+		trueText = trueText + str(x[i])
+	return trueText
+
+def ciphertextSort(x):
+	trueText = ""
+	for i in range(len(x)):
+		trueText = trueText + str(x[i])
+	return trueText[:-1]
+
+message = input("Enter message: ")
+print ("Encrypting... (this may take a while)")
+ciphertextOne = encryptor(privKey, message)
+ciphertext = ciphertextSort(ciphertextOne)
+print ("Ciphertext:", ciphertext)
+print ("Decrypting... (this may take a while)")
+plaintext = decryptor(publKey, ciphertextOne)
+print ("Plaintext:", textSort(plaintext))
