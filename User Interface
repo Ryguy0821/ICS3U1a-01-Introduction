@@ -1,43 +1,94 @@
 #User Interface
 #Ryan
 
-import pygame
+import pygame as pg
 
-pygame.init()
+pg.init()
 displayHeight = 1900
 displayWidth = 1000
 
 def textDisplay(text,x,y,black):
-    font = pygame.font.SysFont("timesnewroman",20)
+    font = pg.font.SysFont("timesnewroman",20)
     text = font.render(text, True, black)
     gameDisplay.blit(text,(x*0.45,y*0.4))
-    pygame.display.update()
+    pg.display.update()
 
 def background(Img):
     gameDisplay.blit(Img,(0,0))
+
+def main():
+    screen = pg.display.set_mode((1900, 1000))
+    font = pg.font.Font(None, 32)
+    clock = pg.time.Clock()
+    input_box = pg.Rect(100, 100, 140, 32)
+    color_inactive = pg.Color('lightskyblue3')
+    color_active = pg.Color('dodgerblue2')
+    color = color_inactive
+    active = False
+    text = ''
+    done = False
+
+    while not done:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                done = True
+            if event.type == pg.MOUSEBUTTONDOWN:
+                # If the user clicked on the input_box rect.
+                if input_box.collidepoint(event.pos):
+                    # Toggle the active variable.
+                    active = not active
+                else:
+                    active = False
+                # Change the current color of the input box.
+                color = color_active if active else color_inactive
+            if event.type == pg.KEYDOWN:
+                if active:
+                    if event.key == pg.K_RETURN:
+                        print(text)
+                        return text
+                        text = ''
+                    elif event.key == pg.K_BACKSPACE:
+                        text = text[:-1]
+                    else:
+                        text += event.unicode
+
+        screen.fill((30, 30, 30))
+        # Render the current text.
+        txt_surface = font.render(text, True, color)
+        # Resize the box if the text is too long.
+        width = max(200, txt_surface.get_width()+10)
+        input_box.w = width
+        # Blit the text.
+        screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
+        # Blit the input_box rect.
+        pg.draw.rect(screen, color, input_box, 2)
+
+        pg.display.flip()
+        clock.tick(30)
+        
     
 
 white = (255,255,255)
 black = (0,0,0)
 
-backgroundImg = pygame.image.load('background.png')
-backgroundImg = pygame.transform.scale(backgroundImg,(1900,1000))
+backgroundImg = pg.image.load('background.png')
+backgroundImg = pg.transform.scale(backgroundImg,(1900,1000))
 
-gameDisplay = pygame.display.set_mode((displayHeight,displayWidth))
-pygame.display.set_caption('BiSA-Encryption')
-clock = pygame.time.Clock()
+gameDisplay = pg.display.set_mode((displayHeight,displayWidth))
+pg.display.set_caption('BiSA-Encryption')
+clock = pg.time.Clock()
 
 gameDisplay.fill(white)
 
-rectplace = pygame.draw.rect(gameDisplay, (white),(852, 400, 150, 20))
-encryptRectplace = pygame.draw.rect(gameDisplay, (white),(885, 560, 80, 20))
-decryptRectplace = pygame.draw.rect(gameDisplay, (white),(890, 680, 75, 20))
+rectplace = pg.draw.rect(gameDisplay, (white),(852, 400, 150, 20))
+encryptRectplace = pg.draw.rect(gameDisplay, (white),(885, 560, 80, 20))
+decryptRectplace = pg.draw.rect(gameDisplay, (white),(890, 680, 75, 20))
 
 def menu():
     background(backgroundImg)
-    rectplace = pygame.draw.rect(gameDisplay, (white),(852, 400, 150, 20))
-    encryptRectplace = pygame.draw.rect(gameDisplay, (white),(885, 560, 80, 20))
-    decryptRectplace = pygame.draw.rect(gameDisplay, (white),(890, 680, 75, 20))
+    rectplace = pg.draw.rect(gameDisplay, (white),(852, 400, 150, 20))
+    encryptRectplace = pg.draw.rect(gameDisplay, (white),(885, 560, 80, 20))
+    decryptRectplace = pg.draw.rect(gameDisplay, (white),(890, 680, 75, 20))
     textDisplay("BiSA-Encryption",displayHeight,displayWidth,black)
     textDisplay("Encrypt",2000,1400,black)
     textDisplay("Decrypt",2000,1700,black)
@@ -47,12 +98,14 @@ menu()
 crashed = False
 
 while not crashed:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
             crashed = True
 
-    pos = pygame.mouse.get_pos()
-    pressed1, pressed2, pressed3 = pygame.mouse.get_pressed()
+    pos = pg.mouse.get_pos()
+    pressed1, pressed2, pressed3 = pg.mouse.get_pressed()
+
+    menu()
 
     if rectplace.collidepoint(pos) and pressed1:
         print ("clicked")
@@ -61,14 +114,14 @@ while not crashed:
         print ("encrypt")
         background(backgroundImg)
         textDisplay("Type message in python shell.",2000,1550,black)
-        message = input("What would you like to encrypt?")
-        menu()
+        message = main()
+        
 
     if decryptRectplace.collidepoint(pos) and pressed1:
         print ("decrypt")
         background(backgroundImg)
         textDisplay("Type encrypted mesage in pyhton shell.",2000,1550,black)
-        message = input("what would you like to decrypt?")
-        menu()
+        message = main()
+        
 
 
