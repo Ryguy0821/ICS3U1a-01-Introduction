@@ -1,0 +1,275 @@
+#User Interface
+#Ryan
+
+import pygame as pg
+import math,random
+
+
+def selPrimes():
+    print("Call check")
+    global p, q
+    number = main("Input a prime number for 'p':",False,False)
+    p = int(number)
+    print(p)
+    num = main("Input a prime number for 'q':",False,False)
+    q = int(num)
+    print(q)
+    if p == q:
+        print ("They cannot be equal.")
+        selPrimes()
+
+def gcd(a, b):
+    divisor = math.gcd(a, b)
+    return divisor
+
+def extEuclidAlgorithm(e, phi):
+	'''This particular integration of the Extended Euclidean Algorithm is based on the works of JonCooperWorks on Git. I understand finding the multiplicative inverse of numbers using EEA to a certain degree but had trouble integrating the methods of calculation on Python3. I documented the code as far as I could understand.''' 
+
+	X1 = 0
+	X2 = 1
+	Y1 = 1
+	d = 0
+
+	propPhi = phi
+	while e > 0:
+		tempOne = propPhi // e
+		tempTwo = propPhi - tempOne * e
+		propPhi = e
+		e = tempTwo
+        
+		X = X2 - tempOne * X1
+		Y = d - tempOne * Y1
+		
+		X2 = X1
+		X1 = X
+		d = Y1
+		Y1 = Y
+
+	if propPhi == 1:
+		return d + phi
+
+def coprimeCorrector(phi):
+	'''Corrects greatest common divisor for phi(n) and e to assume whether or not e is coprime with phi(n) and assign it to a new coprime value if not coprime.'''
+	global e
+	x = gcd(e, phi)
+	while x != 1:
+		e = random.randint(2, phi - 1)
+		x = gcd(e, phi)
+
+def coprimeConstant(phi):
+	global e
+	e = random.randint(2, phi - 1)
+
+def primeCheck(x):
+    yesPrime = False
+    if x < 2:
+        return yesPrime
+    if x % 2 == 0:
+        return yesPrime
+    for x in range(3, int(math.sqrt(x))+ 2, 2):
+        if x % 2 == 0:
+            return yesPrime
+    yesPrime = True
+    return yesPrime
+
+def primeFinalCheck(p, q):
+	if p < 100:
+		print ("To ensure maximum security, please use values atleast 3 digits long.")
+		return False
+	if q < 100:
+		print ("To ensure maximum security, please use values atleast 3 digits long.")
+		return False
+	if (primeCheck(p) and primeCheck(q)) == False:
+		print ("Both numbers must be prime.")
+		return False
+	else:
+		return True
+
+def keygen(p, q):
+	global e
+	phi = (p-1)*(q-1) # Golden ratio
+	n = (p * q)
+	coprimeConstant(phi)
+	coprimeCorrector(phi)
+	d = extEuclidAlgorithm(e, phi)
+	return ((e, n), (d, n))
+
+def encryptor(privKey, confidential):
+	trueText = []
+	key, n = privKey
+	for i in range(0, len(confidential)):
+		trueText.append((ord(confidential[i]) ** key) % n)
+	return trueText
+
+def decryptor(publKey, confidential):
+	trueText = []
+	keytuple = tuple(int(i) for i in publKey.split(","))
+	key, n = keytuple
+	true = list(map(int, confidential.split()))
+	for i in range(0, len(true)):
+		trueText.append(chr((true[i] ** key) % n))
+	return trueText
+
+def textSort(x):
+	trueText = ""
+	for i in range(len(x)):
+		trueText = trueText + str(x[i])
+	return trueText
+
+def ciphertextSort(x):
+	trueText = ""
+	for i in range(len(x)):
+		trueText = trueText + str(x[i]) + " "
+	return trueText[:-1]
+
+
+def textDisplay(text,x,y,black):
+    font = pg.font.SysFont("timesnewroman",20)
+    text = font.render(text, True, black)
+    gameDisplay.blit(text,(x*0.45,y*0.4))
+    pg.display.flip()
+
+def background(Img):
+    gameDisplay.blit(Img,(0,0))
+
+def main(encdec,encrypting,decrypting):
+    screen = pg.display.set_mode((1224, 800))
+    font = pg.font.Font(None, 32)
+    clock = pg.time.Clock()
+    input_box = pg.Rect(100, 100, 140, 32)
+    color_inactive = pg.Color('lightskyblue3')
+    color_active = pg.Color('black')
+    color = color_inactive
+    active = False
+    text = ''
+    done = False
+
+    while not done:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                done = True
+            if event.type == pg.MOUSEBUTTONDOWN:
+                # If the user clicked on the input_box rect.
+                if input_box.collidepoint(event.pos):
+                    # Toggle the active variable.
+                    active = not active
+                else:
+                    active = False
+                # Change the current color of the input box.
+                color = color_active if active else color_inactive
+            if event.type == pg.KEYDOWN:
+                if active:
+                    if event.key == pg.K_RETURN:
+                        message = text
+
+                        if encrypting == True:
+                            selPrimes()
+                        
+                            while True:
+                                if primeFinalCheck(p, q) == False:
+                                    selPrimes()
+                                else:
+                                    break
+                            
+                            print("Public, Private Key:", keygen(p, q))
+                            publKey, privKey = keygen(p, q)
+                            print("Encrypting... (this may take a while)")
+                            ciphertextOne = encryptor(privKey, message)
+                            ciphertext = ciphertextSort(ciphertextOne)
+                            print ("Ciphertext:", ciphertext)
+
+            
+                        text = ''
+                    elif event.key == pg.K_BACKSPACE:
+                        text = text[:-1]
+                    else:
+                        text += event.unicode
+
+        screen.fill((60, 180, 210))
+        # Render the current text.
+        txt_surface = font.render(text, True, color)
+        # Resize the box if the text is too long.
+        width = max(200, txt_surface.get_width()+10)
+        input_box.w = width
+        # Blit the text.
+        screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
+        # Blit the input_box rect.
+        pg.draw.rect(screen, color, input_box, 2)
+        textDisplay(str(encdec),displayWidth*0.35,displayHeight*0.15,black)
+     
+
+        pg.display.flip()
+        clock.tick(30)
+    
+        
+def menu():
+    background(backgroundImg)
+    rectplace = pg.draw.rect(gameDisplay, (white),(852, 400, 150, 20))
+    encryptRectplace = pg.draw.rect(gameDisplay, (white),(885, 560, 80, 20))
+    decryptRectplace = pg.draw.rect(gameDisplay, (white),(890, 680, 80, 20))
+    textDisplay("BiSA-Encryption",displayHeight,displayWidth,black)
+    textDisplay("Encrypt",displayWidth*1.62,displayHeight*0.85,black)
+    textDisplay("Decrypt",displayWidth*1.62,displayHeight*1.1,black)
+    
+pg.init()
+displayHeight = 1224
+displayWidth = 800
+
+p = 0
+q = 0
+e = 0
+d = 0
+
+
+
+white = (255,255,255)
+black = (0,0,0)
+
+backgroundImg = pg.image.load('background.png.jpg')
+backgroundImg = pg.transform.scale(backgroundImg,(1224,800))
+
+gameDisplay = pg.display.set_mode((displayHeight,displayWidth))
+pg.display.set_caption('BiSA-Encryption')
+clock = pg.time.Clock()
+
+gameDisplay.fill(white)
+
+rectplace = pg.draw.rect(gameDisplay, (white),(displayHeight,displayWidth, 150, 20))
+encryptRectplace = pg.draw.rect(gameDisplay, (white),(885, 560, 80, 20))
+decryptRectplace = pg.draw.rect(gameDisplay, (white),(890, 680, 80, 20))
+
+menu()
+
+crashed = False
+
+while not crashed:
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            crashed = True
+
+    pos = pg.mouse.get_pos()
+    pressed1, pressed2, pressed3 = pg.mouse.get_pressed()
+
+    menu()
+
+    if encryptRectplace.collidepoint(pos) and pressed1:
+        background(backgroundImg)
+        main("Encrypt Message:",True,False)
+        
+        
+        #textDisplay(encryptedMessage,2000,1550,black)        
+
+    if decryptRectplace.collidepoint(pos) and pressed1:
+        background(backgroundImg)
+        message = main("Decrypt:",False,True)
+        print ("decrypt")
+        print(message)
+        print ("Decrypting... (this may take a while)")
+        publKeyin = input("Input the public key (do not input the brackets): ")
+        ciphertextin = input("Input the ciphertext: ")
+        plaintext = decryptor(publKeyin, ciphertextin)
+        print ("Plaintext:", textSort(plaintext))
+   
+        
+        #textDisplay(decryptedMessage,2000,1550,black)
+
