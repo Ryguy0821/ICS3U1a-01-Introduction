@@ -6,7 +6,7 @@ import math, random
 
 
 def selPrimes():
-	'''Takes in input for 2 prime values (can be semi-prime but not recommended) and checks to see if they are equal. If so, function is re-ran.'''
+    '''Takes in input for 2 prime values (can be semi-prime but not recommended) and checks to see if they are equal. If so, function is re-ran.'''
     print("Call check")
     global p, q
     number = main("Input a prime number for 'p':",False,False)
@@ -20,7 +20,7 @@ def selPrimes():
         selPrimes()
 
 def gcd(a, b):
-	'''Uses math library to find the greatest common divisor for two values and is used in determining value for the Phi function.'''
+    '''Uses math library to find the greatest common divisor for two values and is used in determining value for the Phi function.'''
     divisor = math.gcd(a, b)
     return divisor
 
@@ -64,7 +64,7 @@ def coprimeConstant(phi):
 	e = random.randint(2, phi - 1)
 
 def primeCheck(x):
-	'''Checks if inputted values for p and q (when inputted in parameters) are prime. Unfortuneately this algorithm doesn't account for semi-primes. Semi-primes work most of the time in RSA but sometimes do not, causing the plaintext to not equal the original text.'''
+    '''Checks if inputted values for p and q (when inputted in parameters) are prime. Unfortuneately this algorithm doesn't account for semi-primes. Semi-primes work most of the time in RSA but sometimes do not, causing the plaintext to not equal the original text.'''
     yesPrime = False
     if x < 2: # Values under 2 can't be prime, duh
         return yesPrime
@@ -135,15 +135,18 @@ def ciphertextSort(x):
 # Graphical/integration functions start here:
 
 def textDisplay(text,x,y,black):
+    '''displays the inputted text on the screen'''
     font = pg.font.SysFont("timesnewroman",20)
     text = font.render(text, True, black)
     gameDisplay.blit(text,(x*0.45,y*0.4))
     pg.display.flip()
 
 def background(Img):
+    '''sets the background to the background image'''
     gameDisplay.blit(Img,(0,0))
 
 def main(encdec,encrypting,decrypting):
+    '''puts a text box onto the screen which the user can input a message into'''
     screen = pg.display.set_mode((1224, 800))
     font = pg.font.Font(None, 32)
     clock = pg.time.Clock()
@@ -214,6 +217,7 @@ def main(encdec,encrypting,decrypting):
     
         
 def menu():
+    '''displays the main menu back onto the screen''' 
     background(backgroundImg)
     rectplace = pg.draw.rect(gameDisplay, (white),(852, 400, 150, 20))
     encryptRectplace = pg.draw.rect(gameDisplay, (white),(885, 560, 80, 20))
@@ -258,19 +262,19 @@ while not crashed:
         if event.type == pg.QUIT:
             crashed = True
 
-    pos = pg.mouse.get_pos()
-    pressed1, pressed2, pressed3 = pg.mouse.get_pressed()
+    pos = pg.mouse.get_pos()           #gets the position of the user mouse
+    pressed1, pressed2, pressed3 = pg.mouse.get_pressed()    #checks if the user clicked
 
     menu()
 
-    if encryptRectplace.collidepoint(pos) and pressed1:
+    if encryptRectplace.collidepoint(pos) and pressed1:           #checks if the user clicked the encrypt rect 
         background(backgroundImg)
         main("Encrypt Message:",True,False)
         
         
         #textDisplay(encryptedMessage,2000,1550,black)        
 
-    if decryptRectplace.collidepoint(pos) and pressed1:
+    if decryptRectplace.collidepoint(pos) and pressed1:                #checks if the user clicked the decypt rect
         background(backgroundImg)
         message = main("Decrypt:",False,True)
         print ("decrypt")
