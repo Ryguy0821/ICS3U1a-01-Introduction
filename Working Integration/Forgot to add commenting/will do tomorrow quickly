@@ -1,42 +1,41 @@
 #User Interface
-#Ryan,ross,Ares
+#Ryan,Ross,Ares
 
 import pygame as pg
 import math,random
 
-
 def selPrimes():
-    print("Call check")
+    '''Takes in input for 2 prime values (can be semi-prime but not recommended) and checks to see if they are equal. If so, function is re-ran.'''
     global p, q
     number = main("Input a prime number for 'p':",(displayWidth*0.35),(displayHeight*0.15),False,False,False,True)
     p = int(number)
-    print(p)
     num = main("Input a prime number for 'q':",(displayWidth*0.35),(displayHeight*0.15),False,False,False,True)
     q = int(num)
-    print(q)
     if p == q:
-        print ("They cannot be equal.")
+        main("Primes cannot be equal",(displayWidth*0.3),(displayHeight*0.3),False,False,False,True)
         selPrimes()
 
 
 def gcd(a, b):
+    '''Uses math library to find the greatest common divisor for two values and is used in determining value for the Phi function.'''
     divisor = math.gcd(a, b)
     return divisor
 
 def extEuclidAlgorithm(e, phi):
 	'''This particular integration of the Extended Euclidean Algorithm is based on the works of JonCooperWorks on Git. I understand finding the multiplicative inverse of numbers using EEA to a certain degree but had trouble integrating the methods of calculation on Python3. I documented the code as far as I could understand.''' 
+    # Assigns dividend and divisor values to 0s and 1s to set up finding the inverse modulus.
 
 	X1 = 0
 	X2 = 1
 	Y1 = 1
 	d = 0
 
-	propPhi = phi
-	while e > 0:
-		tempOne = propPhi // e
-		tempTwo = propPhi - tempOne * e
-		propPhi = e
-		e = tempTwo
+	propPhi = phi # Makes a temporary value for Phi
+	while e > 0: # If e = 0 then the calculation is completed and the private key is generated mathematically
+		tempOne = propPhi // e # Returns temporary Phi value by no-remainder dividing the current e value
+		tempTwo = propPhi - tempOne * e # Sets temporary value for temporary Phi subtract the product of first temporary value times current e value
+		propPhi = e # Declares the new temporary phi value as the current e value
+		e = tempTwo # Sets the e value for second temporary value
         
 		X = X2 - tempOne * X1
 		Y = d - tempOne * Y1
@@ -46,94 +45,112 @@ def extEuclidAlgorithm(e, phi):
 		d = Y1
 		Y1 = Y
 
-	if propPhi == 1:
+	if propPhi == 1: # When inverse modulus is found, it returns the private key which is the sum of the d and phi value
 		return d + phi
 
 def coprimeCorrector(phi):
 	'''Corrects greatest common divisor for phi(n) and e to assume whether or not e is coprime with phi(n) and assign it to a new coprime value if not coprime.'''
 	global e
 	x = gcd(e, phi)
-	while x != 1:
+	while x != 1: # If value is coprime, the gcd of e and phi must be equal to 1
 		e = random.randint(2, phi - 1)
 		x = gcd(e, phi)
 
 def coprimeConstant(phi):
-	global e
-	e = random.randint(2, phi - 1)
+    '''First selection of the coprime value for e but doesn't check if its coprime (redundant function, but who cares? Let's make it object oriented anyways...)'''
+    global e
+    e = random.randint(2, phi - 1) 
 
 def primeCheck(x):
+    '''Checks if inputted values for p and q (when inputted in parameters) are prime. Unfortuneately this algorithm doesn't account for semi-primes. Semi-primes work most of the time in RSA but sometimes do not, causing the plaintext to not equal the original text.'''
     yesPrime = False
-    if x < 2:
+    if x < 2: # Values under 2 can't be prime, duh
         return yesPrime
-    if x % 2 == 0:
+    if x % 2 == 0: # If the value mod 2 is equal to 0 then it obviously can't be prime because theres no remainder
         return yesPrime
-    for x in range(3, int(math.sqrt(x))+ 2, 2):
+    for x in range(3, int(math.sqrt(x))+ 2, 2): # This is a universal mathematical formula for determining if a number is prime. Start from 3, take the root of the number and add 2, then go up by intervals of 2. Check if the value mod 2 is equal to 0, and if so, it is not prime
         if x % 2 == 0:
             return yesPrime
-    yesPrime = True
+    yesPrime = True # If all checks run through, the number is prime (or semi-prime) and the result is returned as True
     return yesPrime
 
 def primeFinalCheck(p, q):
-	if p < 100:
-		print ("To ensure maximum security, please use values atleast 3 digits long.")
-		return False
-	if q < 100:
-		print ("To ensure maximum security, please use values atleast 3 digits long.")
-		return False
-	if (primeCheck(p) and primeCheck(q)) == False:
-		print ("Both numbers must be prime.")
-		return False
-	else:
-		return True
+    '''Calls on primeCheck(x) function and checks if values are under 100 to ensure a decent amount of security for encryption'''
+    if p < 100:
+        textDisplay("To ensure maximum security, please use values atleast 3 digits long.",300,500,black)
+        pg.display.flip()
+        pg.time.delay(3000)
+        return False
+    if q < 100:
+        textDisplay("To ensure maximum security, please use values atleast 3 digits long.",300,500,black)
+        pg.display.flip()
+        pg.time.delay(3000)
+        return False
+    if (primeCheck(p) and primeCheck(q)) == False: # Simply checks if each prime checks are False
+        textDisplay("Both numbers must be prime.",300,500,black)
+        pg.display.flip()
+        pg.time.delay(3000)
+        return False
+    else:
+        return True
 
 def keygen(p, q):
-	global e
-	phi = (p-1)*(q-1) # Golden ratio
-	n = (p * q)
-	coprimeConstant(phi)
-	coprimeCorrector(phi)
-	d = extEuclidAlgorithm(e, phi)
-	return ((e, n), (d, n))
+    '''Generates the public and private keys for the message inputted calling upon generating the phi, phi(n), n, d (private key calculated by inverse modulo using Extended Euclidean mathematics), and returns the keys as a result of tuples (lists were inefficient).'''
+    global e
+    phi = (p-1)*(q-1) # Golden ratio
+    n = (p * q)
+    coprimeConstant(phi) # Generates 'e', or phi(n)
+    coprimeCorrector(phi) # Corrects phi(n) if it isn't coprime
+    d = extEuclidAlgorithm(e, phi) # Generates private key using Extended Euclidean mathematics by finding inverse modulus
+    return ((e, n), (d, n)) # Returns keys as a result of tuples, we used lists earlier but were inefficient
 
 def encryptor(privKey, confidential):
-	trueText = []
-	key, n = privKey
-	for i in range(0, len(confidential)):
-		trueText.append((ord(confidential[i]) ** key) % n)
-	return trueText
+    '''Encrypts message by using the private key to encrypt and plugging in numbers for the RSA universal equation. Uses a list to store the encrypted ASCII values.'''
+    trueText = []
+    key, n = privKey # Assigns values from tuple version of key
+    for i in range(0, len(confidential)):
+        trueText.append((ord(confidential[i]) ** key) % n) # Appends encrypted ASCII values to a list
+    return trueText
 
 def decryptor(publKey, confidential):
-	trueText = []
-	keytuple = tuple(int(i) for i in publKey.split(","))
-	key, n = keytuple
-	true = list(map(int, confidential.split()))
-	for i in range(0, len(true)):
-		trueText.append(chr((true[i] ** key) % n))
-	return trueText
+    '''Uses public key to encrypt ciphertext. Takes in string version of ciphertext and turns it into a tuple, assigning it for key and n values, assigning it to a list, then plugging them into the universal RSA decryption equation.'''
+    trueText = []
+    keytuple = tuple(int(i) for i in publKey.split(",")) # Converts to tuple for readability purposes
+    key, n = keytuple
+    true = list(map(int, confidential.split())) # Turns ciphertext into list elements
+    for i in range(0, len(true)):
+        trueText.append(chr((true[i] ** key) % n)) # Plugs values into equation to decrypt them all using public key
+    return trueText
 
 def textSort(x):
-	trueText = ""
-	for i in range(len(x)):
-		trueText = trueText + str(x[i])
-	return trueText
+    '''Sorts text to look nice when displayed.'''
+    trueText = ""
+    for i in range(len(x)):
+	    trueText = trueText + str(x[i])
+    return trueText
 
 def ciphertextSort(x):
-	trueText = ""
-	for i in range(len(x)):
-		trueText = trueText + str(x[i]) + " "
-	return trueText[:-1]
+    '''Sorts ciphertext to not only look nice, but come out in proper format for easy copy and pasting.'''
+    trueText = ""
+    for i in range(len(x)):
+	    trueText = trueText + str(x[i]) + " "
+    return trueText[:-1]
 
+# Graphical documentation starts 
 
 def textDisplay(text,x,y,black):
+    '''displays the text onto the screen'''
     font = pg.font.SysFont("timesnewroman",20)
     text = font.render(text, True, black)
     gameDisplay.blit(text,(x*0.45,y*0.4))
     pg.display.flip()
 
 def background(Img):
+    '''displays the background image'''
     gameDisplay.blit(Img,(0,0))
 
 def main(encdec,x,y,encrypting,decrypting,primePick,textReturn):
+    '''displays a input textbox onto the screen which the user can type in'''
     screen = pg.display.set_mode((1224, 800))
     font = pg.font.Font(None, 32)
     clock = pg.time.Clock()
@@ -160,7 +177,7 @@ def main(encdec,x,y,encrypting,decrypting,primePick,textReturn):
                 color = color_active if active else color_inactive
             if event.type == pg.KEYDOWN:
                 if active:
-                    if event.key == pg.K_RETURN:###############################################
+                    if event.key == pg.K_RETURN:
                         message = text
                         
                         if textReturn == True:
@@ -178,24 +195,23 @@ def main(encdec,x,y,encrypting,decrypting,primePick,textReturn):
             
                             publKey, privKey = keygen(p, q)
                             textDisplay("Public Key:"+str(publKey),650,400,black)
-                            print("Public Key:", publKey)
                             textDisplay("Encrypting... (this may take a while)",650,450,black)
-                            print("Encrypting... (this may take a while)")
                             ciphertextOne = encryptor(privKey, message)
                             ciphertext = ciphertextSort(ciphertextOne)
+                            print("Ciphertext: ",ciphertext)
+                            print("Public Key: ",publKey)
                             textDisplay("Ciphertext: "+ciphertext,650,500,black)
-                            print ("Ciphertext:", ciphertext)
-                            textDisplay("Click 'X' to go back to main menu"+ciphertext,500,650,black)
-                            pg.time.delay(4000)
+                            textDisplay("Click 'X' to go back to main menu ",500,650,black)
+                            textDisplay("Ciphertext and Public key can also be found in python shell for longer storage",500,700,black) 
+                            pg.time.delay(8000)
 
                         if decrypting == True:
-                            print ("decrypt")
-                            publKeyin = input("Input the public key (do not input the brackets): ")
-                            ciphertextin = input("Input the ciphertext: ")
+                            publKeyin= main("Input the public key (do not input the brackets): ",(displayWidth*0.35),(displayHeight*0.15),False,False,False,True)
                             plaintext = decryptor(publKeyin, message)
-                            print ("Plaintext:", textSort(plaintext))
-
-            
+                            textDisplay("Plaintext: "+textSort(plaintext),650,400,black)
+                            textDisplay("Click 'X' to go back to main menu ",500,450,black)
+                            pg.time.delay(6000)
+                            
                         text = ''
                     elif event.key == pg.K_BACKSPACE:
                         text = text[:-1]
@@ -217,13 +233,11 @@ def main(encdec,x,y,encrypting,decrypting,primePick,textReturn):
      
         pg.display.flip()
         clock.tick(30)
-    
-        
+         
 def menu():
+    '''displays the menu onto the screen'''
     background(backgroundImg)
     rectplace = pg.draw.rect(gameDisplay, (white),(542, 322, 150, 20))
-    encryptRectplace = pg.draw.rect(gameDisplay, (white),(578, 416, 80, 20))
-    decryptRectplace = pg.draw.rect(gameDisplay, (white),(578, 540, 80, 20))
     textDisplay("BiSA-Encryption",displayHeight,displayWidth,black)
     textDisplay("Encrypt",displayWidth*1.62,displayHeight*0.85,black)
     textDisplay("Decrypt",displayWidth*1.62,displayHeight*1.1,black)
@@ -236,8 +250,6 @@ p = 0
 q = 0
 e = 0
 d = 0
-
-
 
 white = (255,255,255)
 black = (0,0,0)
@@ -264,20 +276,16 @@ while not crashed:
         if event.type == pg.QUIT:
             crashed = True
 
-    pos = pg.mouse.get_pos()
-    pressed1, pressed2, pressed3 = pg.mouse.get_pressed()
+    pos = pg.mouse.get_pos()                           #gets the position of the mouse
+    pressed1, pressed2, pressed3 = pg.mouse.get_pressed()              #checks when the mouse is clicked
 
     menu()
 
-    if encryptRectplace.collidepoint(pos) and pressed1:
+    if encryptRectplace.collidepoint(pos) and pressed1:            #checks if the rect is clicked
         background(backgroundImg)
         main("Encrypt Message:",(displayWidth*0.35),(displayHeight*0.15),True,False,True,False)
-        
-        #textDisplay(encryptedMessage,2000,1550,black)        
-
-    if decryptRectplace.collidepoint(pos) and pressed1:
+             
+    if decryptRectplace.collidepoint(pos) and pressed1:             #checks if the rect is clicked
         background(backgroundImg)
         main("Decrypt:",(displayWidth*0.35),(displayHeight*0.15),False,True,False,False)
-        
-        #textDisplay(decryptedMessage,2000,1550,black)
-
+           
